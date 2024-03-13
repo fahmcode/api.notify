@@ -1,15 +1,23 @@
 const express = require("express");
-
+const mongoose = require("mongoose");
+const cors = require("cors");
+const authRoutes = require("./src/routes/auth.routes");
+const errorHandler = require("./src/middlewares/error.middleware");
+require("dotenv").config();
 const app = express();
+const port = process.env.PORT || 5000;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+// Connect to database
+require("./src/utilities/db.config");
 
-app.post("/", (req, res) => {
-  res.send("Hello World!");
-});
+// Middlewares
+app.use(express.json());
+app.use(cors());
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+// Routes
+app.use("/api/auth", authRoutes);
+
+// Error handler
+app.use(errorHandler);
+
+app.listen(port, () => console.log(`Server listening on port ${port}`));
