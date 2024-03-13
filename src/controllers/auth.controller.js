@@ -22,7 +22,13 @@ exports.register = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "30d",
     });
-    res.json({ token });
+
+    res.json({
+      accessToken: token,
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -48,7 +54,13 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "30d",
     });
-    res.json({ token });
+
+    res.json({
+      accessToken: token,
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
