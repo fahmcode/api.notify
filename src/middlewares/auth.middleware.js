@@ -1,20 +1,23 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const { verifyToken } = require("../utilities/auth.utils");
 
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+const authenticateToken = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.userId;
+    const decoded = await verifyToken(token, secret);
+    req.user = decoded;
     next();
   } catch (error) {
-    res.status(403).json({ message: "Invalid token" });
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Unauthorized: Token expired" });
+    } else {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
   }
 };
 
-module.exports = verifyToken;
+module.exports = { authenticateToken };

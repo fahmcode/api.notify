@@ -1,23 +1,22 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const authRoutes = require("./src/routes/auth.routes");
-const errorHandler = require("./src/middlewares/error.middleware");
 require("dotenv").config();
-const app = express();
-const port = process.env.PORT || 5000;
+const express = require("express");
+const cors = require("cors");
 
-// Connect to database
-require("./src/utilities/db.config");
+const { connectDB } = require("./src/utilities/db.utils");
+const port = process.env.PORT || 5000;
+const app = express();
 
 // Middlewares
 app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use("/api/auth", authRoutes);
-
-// Error handler
 app.use(errorHandler);
 
-app.listen(port, () => console.log(`Server listening on port ${port}`));
+// Initialize the database and the App
+(async () => {
+  await connectDB;
+  app.listen(port, () => {
+    console.log(`App running at http://localhost:${port}`);
+  });
+})();
